@@ -7,7 +7,8 @@ class BooksView(Resource):
  
     def get(self):
         books = BookModel.query.all()
-        return {'books':list(x.json() for x in books)}
+        #return {'books':list(x.json() for x in books)}
+        return {'books':list(x.detail_json() for x in books)}
  
     def post(self):
         data = request.get_json()

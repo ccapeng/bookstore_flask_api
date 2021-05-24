@@ -14,7 +14,10 @@ class CategoryModel(db.Model):
  
     def __init__(self, name):
         self.name = name
-     
+
+    def __repr__(self):
+        return f"Category('{self.name}')"
+
     def json(self):
         return {
             "id": self.id,
@@ -30,7 +33,10 @@ class PublisherModel(db.Model):
  
     def __init__(self, name):
         self.name = name
-     
+
+    def __repr__(self):
+        return f"Publisher('{self.name}')"
+
     def json(self):
         return {
             "id": self.id,
@@ -48,14 +54,16 @@ class AuthorModel(db.Model):
     def __init__(self, last_name, first_name):
         self.last_name = last_name
         self.first_name = first_name
-     
+
+    def __repr__(self):
+        return f"Author('{self.last_name}', '{self.first_name}')"
+
     def json(self):
         return {
             "id": self.id,
             "last_name": self.last_name,
             "first_name": self.first_name
         }
-
 
 
 class BookModel(db.Model):
@@ -88,7 +96,10 @@ class BookModel(db.Model):
         self.category_id = category_id
         self.publisher_id = publisher_id 
         self.author_id = author_id 
-     
+
+    def __repr__(self):
+        return f"Book('{self.title}')"
+
     def json(self):
         return {
             "id": self.id,
@@ -96,4 +107,16 @@ class BookModel(db.Model):
             "category_id": self.category_id, 
             "publisher_id": self.publisher_id,
             "author_id": self.author_id,
+        }
+
+    def detail_json(self):
+        return {
+            "id": self.id,
+            "title": self.title, 
+            "category_id": self.category_id, 
+            "publisher_id": self.publisher_id,
+            "author_id": self.author_id,
+            "category": self.category.json(),
+            "publish": self.publisher.json(),
+            "author": self.author.json()
         }

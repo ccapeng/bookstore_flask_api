@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restful import Api
-#from flask_cors import CORS
+from flask_cors import CORS
 
 from bookstore.models import db
 from bookstore.category_view import CategoriesView, CategoryView
@@ -10,14 +10,17 @@ from bookstore.book_view import BooksView, BookView
 
 
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
  
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# print out sql
+app.config["SQLALCHEMY_ECHO"] = True
  
 api = Api(app)
 db.init_app(app)
- 
+print("db:", app.config['SQLALCHEMY_DATABASE_URI'])
+     
 @app.before_first_request
 def create_table():
     db.create_all()
@@ -41,7 +44,10 @@ api.add_resource(AuthorView, '/api/authors/<int:id>')
 api.add_resource(BooksView, '/api/books')
 api.add_resource(BookView, '/api/books/<int:id>')
 
+print("routes:\n", app.url_map)
 
 app.debug = True
 if __name__ == '__main__':
+    print("flash runing ....")
     app.run(host='localhost', port=8081)
+    

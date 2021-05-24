@@ -7,6 +7,7 @@ from bookstore.models import db, \
 class BooksView(Resource):
  
     def get(self):
+
         books = BookModel.query.join(
             CategoryModel, 
             BookModel.category_id == CategoryModel.id
@@ -33,15 +34,30 @@ class BooksView(Resource):
                 "id": book.id,
                 "title": book.title, 
                 "category_id": book.category_id, 
-                "category_name": book["category_name"], 
+                "category": {
+                    "id":  book.category_id, 
+                    "name": book["category_name"]
+                },
                 "publisher_id": book.publisher_id,
-                "publisher_name": book["publisher_name"], 
+                "publisher": {
+                    "id": book.publisher_id,
+                    "name": book["publisher_name"]
+                },
                 "author_id": book.author_id,
-                "author_last_name": book["author_last_name"], 
-                "author_first_name": book["author_first_name"], 
+                "author":{
+                    "id":  book.author_id,
+                    "last_name": book["author_last_name"], 
+                    "first_name": book["author_first_name"], 
+                }
+
             })
 
         return {'books': book_list}, 200
+
+        # The following code also works, but the query is not optimized.
+        # Each category, publisher, author models are sub-query.
+        # books = BookModel.query.all()
+        # return {'books':list(x.detail_json() for x in books)}
 
     def post(self):
         data = request.get_json()
