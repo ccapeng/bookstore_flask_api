@@ -6,8 +6,9 @@ from bookstore.models import db, CategoryModel
 class CategoriesView(Resource):
  
     def get(self):
+        print("get all")
         categories = CategoryModel.query.all()
-        return {'categories':list(category.json() for category in categories)}
+        return list(category.json() for category in categories)
  
     def post(self):
         data = request.get_json()
@@ -30,12 +31,9 @@ class CategoryView(Resource):
         category = CategoryModel.query.filter_by(id=id).first() 
         if category:
             category.name = data["name"]
-        else:
-            category = CategoryModel(name=name,**data)
- 
-        db.session.add(category)
-        db.session.commit()
- 
+            db.session.add(category)
+            db.session.commit()
+
         return category.json()
  
     def delete(self, id):
@@ -43,6 +41,6 @@ class CategoryView(Resource):
         if category:
             db.session.delete(category)
             db.session.commit()
-            return {'msg':'Deleted'}
+            return {'msg':'deleted'}, 204
         else:
             return {'msg': 'Category not found.'}, 404

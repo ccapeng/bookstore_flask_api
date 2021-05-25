@@ -7,11 +7,11 @@ class AuthorsView(Resource):
  
     def get(self):
         authors = AuthorModel.query.all()
-        return {'authors':list(author.json() for author in authors)}
+        return list(author.json() for author in authors)
  
     def post(self):
         data = request.get_json()
-        author = AuthorModel(data['last_name'], data['first_name'])
+        author = AuthorModel.parse(data)
         db.session.add(author)
         db.session.commit()
         return author.json(), 201
@@ -29,13 +29,9 @@ class AuthorView(Resource):
         data = request.get_json()
         author = AuthorModel.query.filter_by(id=id).first() 
         if author:
-            author.last_name = data["last_name"]
-            author.first_name = data["first_name"]
-        else:
-            author = AuthorModel(last_name=last_name, first_name=first_name, **data)
- 
-        db.session.add(author)
-        db.session.commit()
+            author.update(data) 
+            db.session.add(author)
+            db.session.commit()
  
         return author.json()
  

@@ -8,13 +8,13 @@ class BooksView(Resource):
  
     def get(self):
 
-        books = BookModel.query.join(
+        books = BookModel.query.outerjoin(
             CategoryModel, 
             BookModel.category_id == CategoryModel.id
-        ).join (
+        ).outerjoin (
             PublisherModel, 
             BookModel.publisher_id == PublisherModel.id
-        ).join (
+        ).outerjoin (
             AuthorModel, 
             BookModel.author_id == AuthorModel.id
         ).add_columns(
@@ -30,29 +30,9 @@ class BooksView(Resource):
         )
         book_list = []
         for book in books:
-            book_list.append({
-                "id": book.id,
-                "title": book.title, 
-                "category_id": book.category_id, 
-                "category": {
-                    "id":  book.category_id, 
-                    "name": book["category_name"]
-                },
-                "publisher_id": book.publisher_id,
-                "publisher": {
-                    "id": book.publisher_id,
-                    "name": book["publisher_name"]
-                },
-                "author_id": book.author_id,
-                "author":{
-                    "id":  book.author_id,
-                    "last_name": book["author_last_name"], 
-                    "first_name": book["author_first_name"], 
-                }
-
-            })
-
-        return {'books': book_list}, 200
+            obj = BookModel.detail_join_json(book)
+            book_list.append(obj)
+        return book_list, 200
 
         # The following code also works, but the query is not optimized.
         # Each category, publisher, author models are sub-query.
@@ -61,12 +41,8 @@ class BooksView(Resource):
 
     def post(self):
         data = request.get_json()
-        book = BookModel(
-            data['title'], 
-            data['category_id'],
-            data['publisher_id'],
-            data['author_id'],
-        )
+        book = BookModel.parse(data)
+        print("post book", book)
         db.session.add(book)
         db.session.commit()
         return book.json(), 201
@@ -84,20 +60,9 @@ class BookView(Resource):
         data = request.get_json()
         book = BookModel.query.filter_by(id=id).first() 
         if book:
-            book.title = data["title"]
-            book.category_id = data["category_id"]
-            book.publisher_id = data["publisher_id"]
-            book.author_id = data["author_id"]
-        else:
-            book = BookModel(
-                title=title, 
-                category_id=category_id,
-                publisher_id=publisher_id,
-                author_id=author_id
-            )
- 
-        db.session.add(book)
-        db.session.commit()
+            book.update(data)
+            db.session.add(book)
+            db.session.commit()
  
         return book.json()
  

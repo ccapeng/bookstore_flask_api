@@ -7,11 +7,12 @@ class PublishersView(Resource):
  
     def get(self):
         Publishers = PublisherModel.query.all()
-        return {'Publishers':list(publisher.json() for publisher in Publishers)}
+        return list(publisher.json() for publisher in Publishers)
  
     def post(self):
         data = request.get_json()
-        publisher = PublisherModel(data['name'])
+        # publisher = PublisherModel(data['name'])
+        publisher = PublisherModel.parse(data)
         db.session.add(publisher)
         db.session.commit()
         return publisher.json(), 201
@@ -29,12 +30,9 @@ class PublisherView(Resource):
         data = request.get_json()
         publisher = PublisherModel.query.filter_by(id=id).first() 
         if publisher:
-            publisher.name = data["name"]
-        else:
-            publisher = PublisherModel(name=name,**data)
- 
-        db.session.add(publisher)
-        db.session.commit()
+            publisher.name = data["name"] 
+            db.session.add(publisher)
+            db.session.commit()
  
         return publisher.json()
  

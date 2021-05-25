@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_restful import Api
 from flask_cors import CORS
+#from flask_marshmallow import Marshmallow
 
 from bookstore.models import db
 from bookstore.category_view import CategoriesView, CategoryView
@@ -20,19 +21,20 @@ app.config["SQLALCHEMY_ECHO"] = True
 api = Api(app)
 db.init_app(app)
 print("db:", app.config['SQLALCHEMY_DATABASE_URI'])
-     
+
+
 @app.before_first_request
 def create_table():
     db.create_all()
  
-@app.after_request
-def after_request(response):
-    print("after_request")
-    header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    header["Access-Control-Allow-Headers"] = '*'
-    header["Access-Control-Allow-Methods"] = '*'
-    return response
+# @app.after_request
+# def after_request(response):
+#     print("after_request")
+#     header = response.headers
+#     header['Access-Control-Allow-Origin'] = '*'
+#     header["Access-Control-Allow-Headers"] = '*'
+#     header["Access-Control-Allow-Methods"] = '*'
+#     return response
 
 
 api.add_resource(CategoriesView, '/api/categories')
@@ -44,10 +46,10 @@ api.add_resource(AuthorView, '/api/authors/<int:id>')
 api.add_resource(BooksView, '/api/books')
 api.add_resource(BookView, '/api/books/<int:id>')
 
-print("routes:\n", app.url_map)
 
 app.debug = True
 if __name__ == '__main__':
     print("flash runing ....")
-    app.run(host='localhost', port=8081)
+    print("routes:\n", app.url_map)
+    app.run(host='localhost', port=8001)
     
